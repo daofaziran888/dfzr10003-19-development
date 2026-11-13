@@ -33,3 +33,49 @@ body { margin: 0; background: #f6f8fb; color: #1f2937; }
 .link { border: none; background: none; color: var(--brand); cursor: pointer; padding: 0; }
 .page-foot { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--muted); }
 .error-text { color: #b42318; }
+
+/* 依赖沙盘：调度页与重跑页共用同一份路径票的展示样式 */
+.sandbox-panel { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; }
+.sandbox-head { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.sandbox-head h3 { margin: 0; font-size: 15px; }
+.sandbox-badge { border-radius: 999px; padding: 2px 8px; font-size: 12px; background: #eef2ff; color: #1f6feb; }
+.sandbox-badge.status-blocked, .tag.status-blocked { background: #fef3f2; color: #b42318; }
+.sandbox-badge.status-ready, .tag.status-done { background: #ecfdf3; color: #027a48; }
+.sandbox-badge.status-paused, .tag.status-paused { background: #fffaeb; color: #b54708; }
+.sandbox-badge.status-done { background: #ecfdf3; color: #027a48; }
+.sandbox-meta { font-size: 12px; color: var(--muted); }
+.sandbox-safe { font-size: 12px; color: #027a48; background: #ecfdf3; border-radius: 4px; padding: 2px 6px; }
+.sandbox-hint { font-size: 12px; color: var(--muted); }
+.sandbox-waterline { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 10px 0; padding: 8px 10px; background: #f8fafc; border: 1px dashed var(--border); border-radius: 6px; font-size: 12px; }
+.sandbox-subtitle { margin: 14px 0 6px; font-size: 13px; }
+.sandbox-table td, .sandbox-table th { padding: 6px 8px; }
+.sandbox-readonly { background: #f8fafc; color: var(--muted); }
+.cell-sub { display: block; font-size: 11px; color: var(--muted); }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.edge-chip { display: inline-flex; gap: 4px; align-items: center; margin-right: 8px; }
+.edge-chip em, .risk { font-style: normal; font-size: 11px; color: #b42318; margin-left: 4px; }
+.risk { background: #fef3f2; border-radius: 3px; padding: 0 4px; }
+.muted { color: var(--muted); font-size: 12px; }
+.blocking-card { border: 1px solid var(--border); border-left: 3px solid #b42318; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; background: #fffdfd; }
+.blocking-card.resolved { border-left-color: #027a48; background: #fcfdfc; }
+.blocking-line { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13px; }
+.blocking-card p { margin: 6px 0 0; font-size: 12px; color: #344054; }
+.tag { border-radius: 4px; padding: 1px 6px; font-size: 11px; background: #f2f4f7; color: #344054; }
+.tag-done { background: #ecfdf3; color: #027a48; }
+.blocking-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.sandbox-rejected { margin-top: 10px; font-size: 12px; color: var(--muted); }
+.sandbox-rejected ul { margin: 6px 0 0; padding-left: 18px; }
+.sandbox-foot { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
+.sandbox-batch { display: flex; flex-direction: column; gap: 8px; }
+.batch-segment { border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
+.batch-segment header { display: flex; justify-content: space-between; font-size: 12px; }
+.batch-blocked { border-left: 3px solid #b42318; }
+.batch-done { border-left: 3px solid #027a48; }
+.batch-pending { border-left: 3px solid #d0d5dd; background: #fafafa; }
+.partition-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.partition { font-size: 11px; border-radius: 3px; padding: 1px 6px; background: #f2f4f7; color: #344054; }
+.partition.status-done { background: #ecfdf3; color: #027a48; }
+.partition.status-blocked { background: #fef3f2; color: #b42318; }
+.partition.status-pending { background: #f9fafb; color: #98a2b3; }
+.sandbox-create-msg { font-size: 12px; color: #344054; }
+.sandbox-publish { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin: 10px 0 0; padding-top: 10px; border-top: 1px dashed var(--border); }

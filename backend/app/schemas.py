@@ -21,11 +21,90 @@ class ActionResult(BaseModel):
     entry: dict[str, Any] | None = None
 
 
+class SandboxTicket(BaseModel):
+    """路径票：调度页与重跑页共用同一份票面。"""
+
+    ticket_id: str
+    idempotency_key: str
+    root_task: str
+    date_window: dict[str, Any]
+    dag_version: str
+    generated_at: str
+    generated_by: str
+    status: str
+    include_candidate_edges: bool
+    segments: list[dict[str, Any]]
+    edge_order: list[dict[str, Any]]
+    blocking_points: list[dict[str, Any]]
+    rejected_edges: list[dict[str, Any]] = Field(default_factory=list)
+    deferred_edges: list[str] = Field(default_factory=list)
+    excluded_tasks: list[str] = Field(default_factory=list)
+    blocking_watermark: str | None = None
+    blocked_task: str | None = None
+    execution: dict[str, Any]
+    formal_dag_untouched: bool = True
+
+
+class SandboxResult(BaseModel):
+    ok: bool
+    message: str
+    ticket: dict[str, Any] | None = None
+    reused: bool = False
+
+
+class SandboxBatchResult(BaseModel):
+    ok: bool
+    message: str
+    ticket: dict[str, Any] | None = None
+    batch: dict[str, Any] | None = None
+
+
+class SandboxHistory(BaseModel):
+    current_dag_version: str
+    versions: list[dict[str, Any]]
+    ticket_archives: list[dict[str, Any]]
+
+
 class EntryPayload(BaseModel):
     """登记或修改一条业务记录时提交的字段集合。"""
 
     values: dict[str, Any] = Field(default_factory=dict)
     remark: str | None = None
+
+
+class SandboxTicketRequest(BaseModel):
+    """生成依赖沙盘路径票：根任务 + 分区日期窗，同一组合重复生成会沿用旧票。"""
+
+    root_task: str
+    start_date: str
+    end_date: str
+    include_candidate_edges: bool = True
+    operator: str | None = None
+
+
+class SandboxResolutionRequest(BaseModel):
+    """处理沙盘阻塞点：只允许暂缓候选边或把已完成上游设为只读。"""
+
+    action: str
+    target: str
+    remark: str | None = None
+    operator: str | None = None
+
+
+class SandboxExecuteRequest(BaseModel):
+    """确认执行路径票：只创建 BACKFILL-0002 模拟批次，不改正式 DAG。"""
+
+    confirm: bool = False
+    operator: str | None = None
+
+
+class DependencyPublishRequest(BaseModel):
+    """正式依赖发布：必须单独确认，发布后生成新 DAG 版本。"""
+
+    confirm: bool = False
+    edge_ids: list[str] | None = None
+    note: str | None = None
+    operator: str | None = None
 
 
 

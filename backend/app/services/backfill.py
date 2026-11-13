@@ -50,6 +50,11 @@ class BackfillService:
         entry = store.find(MODULE, entry_id)
         if entry is None:
             return None, f"重跑批次 {entry_id} 不存在或已归档"
+        if entry.get("批次编号") == "BACKFILL-0002":
+            return None, (
+                "BACKFILL-0002 由依赖沙盘路径票驱动，请在调度页或重跑页的路径票上确认执行，"
+                "不要直接改批次状态"
+            )
         if action not in ACTION_RULES:
             return None, f"动作「{action}」不属于历史重跑可执行范围"
         target = ACTION_RULES[action]

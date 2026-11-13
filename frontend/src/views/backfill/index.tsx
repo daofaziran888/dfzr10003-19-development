@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { request } from '@/api/client'
+import {
+  SandboxCreateForm,
+  SandboxTicketPanel,
+  useSandboxTicket,
+} from '@/components/SandboxTicketPanel'
 
 const ENDPOINT = '/api/backfill'
 const columns = [
@@ -47,6 +52,7 @@ export default function BackfillView() {
   const [errorMessage, setErrorMessage] = useState('')
   const [filters, setFilters] = useState<Record<string, string>>({})
   const filterFields = useMemo(() => columns.slice(0, 3), [])
+  const sandbox = useSandboxTicket()
 
   const reload = useCallback(async () => {
     setErrorMessage('')
@@ -79,6 +85,7 @@ export default function BackfillView() {
         throw new Error('历史重跑动作未生效，请稍后重试')
       }
       await reload()
+      await sandbox.reload()
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : '历史重跑操作失败')
     }
@@ -89,7 +96,7 @@ export default function BackfillView() {
       <header className="page-head">
         <div>
           <h2>历史重跑管理</h2>
-          <p className="page-desc">维护历史重跑批次的日期范围、并行参数与状态追踪，为数据补数提供可验证的数据工程流程。</p>
+          <p className="page-desc">维护历史重跑批次的日期范围与状态追踪；补跑待办与调度页共用同一份依赖沙盘路径票。</p>
         </div>
         <div className="page-actions">
           <button className="btn primary" type="button" onClick={() => setErrorMessage('重跑批次登记入口尚未接入审批流')}>
@@ -100,6 +107,15 @@ export default function BackfillView() {
           </button>
         </div>
       </header>
+
+      <SandboxCreateForm
+        defaultRoot={sandbox.scenario.root}
+        defaultStart={sandbox.scenario.start}
+        defaultEnd={sandbox.scenario.end}
+        onCreated={() => void sandbox.reload()}
+      />
+      {sandbox.error && <p className="error-text">{sandbox.error}</p>}
+      <SandboxTicketPanel ticket={sandbox.ticket} batch={sandbox.batch} compact onChanged={() => void sandbox.reload()} />
 
       <div className="stat-row">
         {stats.map((item) => (

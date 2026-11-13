@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { request } from '@/api/client'
+import {
+  SandboxCreateForm,
+  SandboxPublishPanel,
+  SandboxTicketPanel,
+  useSandboxTicket,
+} from '@/components/SandboxTicketPanel'
 
 const ENDPOINT = '/api/etl'
 const columns = [
@@ -47,6 +53,7 @@ export default function EtlView() {
   const [errorMessage, setErrorMessage] = useState('')
   const [filters, setFilters] = useState<Record<string, string>>({})
   const filterFields = useMemo(() => columns.slice(0, 3), [])
+  const sandbox = useSandboxTicket()
 
   const reload = useCallback(async () => {
     setErrorMessage('')
@@ -79,6 +86,7 @@ export default function EtlView() {
         throw new Error('ETL任务调度动作未生效，请稍后重试')
       }
       await reload()
+      await sandbox.reload()
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'ETL任务调度操作失败')
     }
@@ -89,7 +97,7 @@ export default function EtlView() {
       <header className="page-head">
         <div>
           <h2>ETL任务调度管理</h2>
-          <p className="page-desc">维护ETL任务的调度配置、依赖关系与告警策略，为数据加工编排提供可验证的数据工程流程。</p>
+          <p className="page-desc">维护ETL任务的调度配置、依赖关系与告警策略；依赖变更先走只读沙盘，路径票不直接写入正式 DAG。</p>
         </div>
         <div className="page-actions">
           <button className="btn primary" type="button" onClick={() => setErrorMessage('调度任务登记入口尚未接入审批流')}>
@@ -100,6 +108,44 @@ export default function EtlView() {
           </button>
         </div>
       </header>
+
+      <SandboxCreateForm
+        defaultRoot={sandbox.scenario.root}
+        defaultStart={sandbox.scenario.start}
+        defaultEnd={sandbox.scenario.end}
+        onCreated={() => void sandbox.reload()}
+      />
+      {sandbox.error && <p className="error-text">{sandbox.error}</p>}
+      <SandboxTicketPanel ticket={sandbox.ticket} batch={sandbox.batch} onChanged={() => void sandbox.reload()} />
+
+      <section className="sandbox-panel">
+        <header className="sandbox-head">
+          <h3>正式依赖发布（单独确认）</h3>
+          <span className="sandbox-meta">当前 DAG 版本 {sandbox.scenario.dagVersion}</span>
+        </header>
+        <p className="sandbox-hint">
+          待发布候选边：{sandbox.scenario.candidates.map((edge) => `${edge.edge_id} ${edge.upstream_task}→${edge.downstream_task}（${edge.status}）`).join('；') || '无'}
+        </p>
+        <SandboxPublishPanel onPublished={() => { void sandbox.reload(); void reload() }} />
+        {sandbox.archive.length > 0 && (
+          <details className="sandbox-rejected">
+            <summary>历史沙盘留档（按 DAG 版本，共 {sandbox.archive.length} 个版本）</summary>
+            <ul>
+              {sandbox.archive.map((archive) => (
+                <li key={archive.dag_version}>
+                  <span className="mono">{archive.dag_version}</span>：
+                  {archive.tickets.length === 0 && '暂无路径票'}
+                  {archive.tickets.map((item) => (
+                    <span key={item.ticket_id} className="edge-chip">
+                      {item.ticket_id}（{item.root_task} {item.date_window.start}~{item.date_window.end}，{item.status}）
+                    </span>
+                  ))}
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
+      </section>
 
       <div className="stat-row">
         {stats.map((item) => (
